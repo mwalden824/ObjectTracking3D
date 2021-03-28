@@ -91,7 +91,23 @@ int main(int argc, const char *argv[])
         // push image into data frame buffer
         DataFrame frame;
         frame.cameraImg = img;
-        dataBuffer.push_back(frame);
+
+        if (imgIndex < dataBufferSize)  // Fill buffer
+        {
+            dataBuffer.push_back(frame);
+        }
+        else
+        {
+            // Shift all images in buffer
+            for (int i = 0; i < dataBuffer.size()-1; i++)
+            {
+                dataBuffer.at(i) = dataBuffer.at(i+1);
+            }
+
+            // Replace last image with new one
+            dataBuffer.pop_back();
+            dataBuffer.push_back(frame);
+        }
 
         cout << "#1 : LOAD IMAGE INTO BUFFER done" << endl;
 
