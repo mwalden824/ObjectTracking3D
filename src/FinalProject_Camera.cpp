@@ -185,6 +185,12 @@ int main(int argc, const char *argv[])
 
         cv::Mat descriptors;
         string descriptorType = "BRISK"; // BRISK, BRIEF, ORB, FREAK, AKAZE, SIFT
+        // string descriptorType = "BRIEF";
+        // string descriptorType = "ORB";
+        // string descriptorType = "FREAK";
+        // string descriptorType = "AKAZE";
+        // string descriptorType = "SIFT";
+        
         descKeypoints((dataBuffer.end() - 1)->keypoints, (dataBuffer.end() - 1)->cameraImg, descriptors, descriptorType);
 
         // push descriptors for current frame to end of data buffer
