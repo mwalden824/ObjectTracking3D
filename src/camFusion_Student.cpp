@@ -246,35 +246,74 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
 
 void matchBoundingBoxes(std::vector<cv::DMatch> &matches, std::map<int, int> &bbBestMatches, DataFrame &prevFrame, DataFrame &currFrame)
 {
-    // For every Bounding box in prevFrame
-    for (auto bbPfIter = prevFrame.boundingBoxes.begin(); bbPfIter != prevFrame.boundingBoxes.end(); ++bbPfIter)
-    {
-        // Initialize a vector of same size as number of bounding boxes in current frame with zeros
-        std::vector<int> corrVal(currFrame.boundingBoxes.size(), 0);
+    // // For every Bounding box in prevFrame
+    // for (auto bbPfIter = prevFrame.boundingBoxes.begin(); bbPfIter != prevFrame.boundingBoxes.end(); ++bbPfIter)
+    // {
+    //     // Initialize a vector of same size as number of bounding boxes in current frame with zeros
+    //     std::vector<int> corrVal(currFrame.boundingBoxes.size(), 0);
 
-        // For every bounding box in currFrame
-        for (auto bbCfIter = currFrame.boundingBoxes.begin(); bbCfIter != currFrame.boundingBoxes.end(); ++bbCfIter)
+    //     // For every bounding box in currFrame
+    //     for (auto bbCfIter = currFrame.boundingBoxes.begin(); bbCfIter != currFrame.boundingBoxes.end(); ++bbCfIter)
+    //     {
+    //         // Loop over all keypoint matches
+    //         for (auto kpmIter = matches.begin(); kpmIter != matches.end(); ++kpmIter)
+    //         {
+    //             // Grab both corresponding keypoints from current match
+    //             cv::KeyPoint ptPrev = prevFrame.keypoints.at((*kpmIter).queryIdx);
+    //             cv::KeyPoint ptCurr = currFrame.keypoints.at((*kpmIter).trainIdx); 
+
+    //             // If both bounding boxes contains the matched keypoints...
+    //             if ((*bbPfIter).roi.contains(ptPrev.pt) && (*bbCfIter).roi.contains(ptCurr.pt))
+    //             {
+    //                 int ind = (int)(bbCfIter - prevFrame.boundingBoxes.begin());
+    //                 // Increase keypoint Correspondance value variable for this combination of bounding boxes
+    //                 corrVal.at(ind) += 1;
+    //             }
+    //         }
+    //     }
+
+    //     int maxCorrBoxID = currFrame.boundingBoxes[std::max_element(corrVal.begin(), corrVal.end()) - corrVal.begin()].boxID;
+
+    //     // Save boxID with highest correspondance value to the boxID of prevFrame
+    //     bbBestMatches.insert(std::make_pair((*bbPfIter).boxID, maxCorrBoxID));
+    // }
+
+
+
+
+    // For each bounding box in previous frame
+    for (auto bbPrevIter = prevFrame.boundingBoxes.begin(); bbPrevIter != prevFrame.boundingBoxes.end(); ++bbPrevIter)
+    {
+        vector<int> corrValVec;
+
+        // For each bounding box in current frame
+        for (auto bbCurrIter = currFrame.boundingBoxes.begin(); bbCurrIter != currFrame.boundingBoxes.end(); ++bbCurrIter)
         {
-            // Loop over all keypoint matches
-            for (auto kpmIter = matches.begin(); kpmIter != matches.end(); ++kpmIter)
+            int corrVal = 0;
+            // For every matched keypoint set
+            for (auto it = matches.begin(); it != matches.end(); ++it)
             {
                 // Grab both corresponding keypoints from current match
-                cv::KeyPoint ptPrev = prevFrame.keypoints.at((*kpmIter).queryIdx);
-                cv::KeyPoint ptCurr = currFrame.keypoints.at((*kpmIter).trainIdx); 
+                cv::KeyPoint kptPrev = prevFrame.keypoints.at((*it).queryIdx);
+                cv::KeyPoint kptCurr = currFrame.keypoints.at((*it).trainIdx);
 
-                // If both bounding boxes contains the matched keypoints...
-                if ((*bbPfIter).roi.contains(ptPrev.pt) && (*bbCfIter).roi.contains(ptCurr.pt))
+                // If the previous frame's bounding box contains the previous frame's matched keypoint AND
+                // the current frame's bounding box contains the current frame's matched keypoint
+                if ((*bbPrevIter).roi.contains(kptPrev.pt) && (*bbCurrIter).roi.contains(kptCurr.pt))
                 {
-                    int ind = (int)(bbCfIter - prevFrame.boundingBoxes.begin());
-                    // Increase keypoint Correspondance value variable for this combination of bounding boxes
-                    corrVal.at(ind) += 1;
+                    // Increase correspondance value for current bounding box combination
+                    corrVal++;
+
                 }
             }
+            corrValVec.push_back(corrVal);
         }
 
-        int maxCorrBoxID = currFrame.boundingBoxes[std::max_element(corrVal.begin(), corrVal.end()) - corrVal.begin()].boxID;
+        // Find max in correspondance value vector
+        int indMax = std::max_element(corrValVec.begin(), corrValVec.end()) - corrValVec.begin();
+        int maxCorrBoxID = currFrame.boundingBoxes[indMax].boxID;
 
-        // Save boxID with highest correspondance value to the boxID of prevFrame
-        bbBestMatches.insert(std::make_pair((*bbPfIter).boxID, maxCorrBoxID));
+        // Set current prevFrame bounding box with the currFrame bounding box of maximum keypoint correspondance
+        bbBestMatches.insert(std::make_pair((*bbPrevIter).boxID, maxCorrBoxID));
     }
 }
