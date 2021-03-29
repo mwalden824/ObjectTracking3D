@@ -246,41 +246,6 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
 
 void matchBoundingBoxes(std::vector<cv::DMatch> &matches, std::map<int, int> &bbBestMatches, DataFrame &prevFrame, DataFrame &currFrame)
 {
-    // // For every Bounding box in prevFrame
-    // for (auto bbPfIter = prevFrame.boundingBoxes.begin(); bbPfIter != prevFrame.boundingBoxes.end(); ++bbPfIter)
-    // {
-    //     // Initialize a vector of same size as number of bounding boxes in current frame with zeros
-    //     std::vector<int> corrVal(currFrame.boundingBoxes.size(), 0);
-
-    //     // For every bounding box in currFrame
-    //     for (auto bbCfIter = currFrame.boundingBoxes.begin(); bbCfIter != currFrame.boundingBoxes.end(); ++bbCfIter)
-    //     {
-    //         // Loop over all keypoint matches
-    //         for (auto kpmIter = matches.begin(); kpmIter != matches.end(); ++kpmIter)
-    //         {
-    //             // Grab both corresponding keypoints from current match
-    //             cv::KeyPoint ptPrev = prevFrame.keypoints.at((*kpmIter).queryIdx);
-    //             cv::KeyPoint ptCurr = currFrame.keypoints.at((*kpmIter).trainIdx); 
-
-    //             // If both bounding boxes contains the matched keypoints...
-    //             if ((*bbPfIter).roi.contains(ptPrev.pt) && (*bbCfIter).roi.contains(ptCurr.pt))
-    //             {
-    //                 int ind = (int)(bbCfIter - prevFrame.boundingBoxes.begin());
-    //                 // Increase keypoint Correspondance value variable for this combination of bounding boxes
-    //                 corrVal.at(ind) += 1;
-    //             }
-    //         }
-    //     }
-
-    //     int maxCorrBoxID = currFrame.boundingBoxes[std::max_element(corrVal.begin(), corrVal.end()) - corrVal.begin()].boxID;
-
-    //     // Save boxID with highest correspondance value to the boxID of prevFrame
-    //     bbBestMatches.insert(std::make_pair((*bbPfIter).boxID, maxCorrBoxID));
-    // }
-
-
-
-
     // For each bounding box in previous frame
     for (auto bbPrevIter = prevFrame.boundingBoxes.begin(); bbPrevIter != prevFrame.boundingBoxes.end(); ++bbPrevIter)
     {
