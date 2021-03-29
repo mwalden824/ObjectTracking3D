@@ -138,7 +138,21 @@ void show3DObjects(std::vector<BoundingBox> &boundingBoxes, cv::Size worldSize, 
 // associate a given bounding box with the keypoints it contains
 void clusterKptMatchesWithROI(BoundingBox &boundingBox, std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPoint> &kptsCurr, std::vector<cv::DMatch> &kptMatches)
 {
-    // ...
+    // For every keypoint match
+    for (auto it = kptMatches.begin(); it != kptMatches.end(); ++it)
+    {
+        // Grab the matching keypoints
+        cv::KeyPoint kptPrev = kptsPrev.at(it->queryIdx);
+        cv::KeyPoint kptCurr = kptsCurr.at(it->trainIdx);
+
+        // Determine if keypoints are within bounding box
+        if (boundingBox->roi.contains(kptPrev.pt) && boundingBox->roi.contains(kptCurr.pt))
+        {
+            // If so, then push current keypoint match onto 
+            // the boundingbox's vector of keypoint matches
+            boundingBox->kptMatches.push_back(*it);
+        }
+    }
 }
 
 
@@ -146,7 +160,6 @@ void clusterKptMatchesWithROI(BoundingBox &boundingBox, std::vector<cv::KeyPoint
 void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPoint> &kptsCurr, 
                       std::vector<cv::DMatch> kptMatches, double frameRate, double &TTC)
 {
-    // ...
     // Compute the distance ratios between all matched keypoints
     vector<double> distRatios;
     for (auto it1 = kptMatches.begin(); it1 != kptMatches.end() - 1; ++it1)
@@ -202,9 +215,8 @@ void computeTTCCamera(std::vector<cv::KeyPoint> &kptsPrev, std::vector<cv::KeyPo
 void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
                      std::vector<LidarPoint> &lidarPointsCurr, double frameRate, double &TTC)
 {
-    // ...
     double dT = 1.0 / frameRate;    // time between two measurements in seconds
-    double laneWidth = 4.0/         // Assumed width of ego lane
+    double laneWidth = 4.0;         // Assumed width of ego lane
     double minXPrev = 1e9, minXCurr = 1e9;
 
     // Find the closest distance to Lidar points within the ego lane
@@ -214,7 +226,7 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
         // If lidar point is within the lane
         if ( (it->y >= -(laneWidth / 2.0)) && (it->y <= (laneWidth / 2.0)) )
         {
-            minXPrev = minXPrev > it-x ? it->x : minXPrev;
+            minXPrev = minXPrev > it->x ? it->x : minXPrev;
         }        
     }
 
@@ -224,7 +236,7 @@ void computeTTCLidar(std::vector<LidarPoint> &lidarPointsPrev,
         // If lidar point is within the lane
         if ( (it->y >= -(laneWidth / 2.0)) && (it->y <= (laneWidth / 2.0)) )
         {
-            minXCurr = minXCurr > it-x ? it->x : minXCurr;
+            minXCurr = minXCurr > it->x ? it->x : minXCurr;
         }
     }
 
