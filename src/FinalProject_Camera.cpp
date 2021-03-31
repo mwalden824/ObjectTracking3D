@@ -110,7 +110,7 @@ int main(int argc, const char *argv[])
             // ttcData << (*detIter) << "," << (*descIter) << ",";
 
             // DEBUG
-            cout << "Computing TTC with " << (*detIter) << " detector and " << (*descIter) << " descriptor." << endl;
+            // cout << "Computing TTC with " << (*detIter) << " detector and " << (*descIter) << " descriptor." << endl;
 
             for (size_t imgIndex = 0; imgIndex <= imgEndIndex - imgStartIndex; imgIndex+=imgStepWidth)
             {
@@ -181,8 +181,8 @@ int main(int argc, const char *argv[])
                 clusterLidarWithROI((dataBuffer.end()-1)->boundingBoxes, (dataBuffer.end() - 1)->lidarPoints, shrinkFactor, P_rect_00, R_rect_00, RT);
 
                 // Visualize 3D objects
-                // bVis = true;
-                bVis = false;
+                bVis = true;
+                // bVis = false;
                 if(bVis)
                 {
                     // show3DObjects((dataBuffer.end()-1)->boundingBoxes, cv::Size(4.0, 20.0), cv::Size(2000, 2000), true);
@@ -343,8 +343,8 @@ int main(int argc, const char *argv[])
                             // Write current TTC to new column cell for current frame
                             // ttcData << ttcCamera << ",";
 
-                            // bVis = true;
-                            bVis = false;
+                            bVis = true;
+                            // bVis = false;
                             if (bVis)
                             {
                                 cv::Mat visImg = (dataBuffer.end() - 1)->cameraImg.clone();
